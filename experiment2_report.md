@@ -35,7 +35,7 @@ Gitee地址：<https://gitee.com/aqqaqq/alien_invasion.git>
 ## 实验过程记录
   我负责alien_invasion文件的前半部分即1-139行，主要部分是游戏的初始化，并创建游戏资源；游戏的主循环；响应按键事件：鼠标键盘按键事件和游戏中“Play”按钮的事件。
 同时还包括添加该项目中使用到的python标准库模块和用户自定义模块。代码部分如下
-#第一步：添加本游戏项目中使用到的Python标准库和用户自定义库
+# 第一步：添加本游戏项目中使用到的Python标准库和用户自定义库
 ```Python
 import sys
 from time import sleep
@@ -50,7 +50,7 @@ from ship import Ship
 from bullet import Bullet
 from alien import Alien
 ```
-#第二步：创建一个用于整个游戏的管理游戏资源和行为的类，包括游戏界面的背景和游戏中的角色的初始化，还有游戏的行为如游戏开始按钮，计分，记录最高分，记录玩家等级等。
+# 第二步：创建一个用于整个游戏的管理游戏资源和行为的类，包括游戏界面的背景和游戏中的角色的初始化，还有游戏的行为如游戏开始按钮，计分，记录最高分，记录玩家等级等。
 ```Python
 class AlienInvasion:
     """管理游戏资源和行为的类"""
@@ -89,6 +89,7 @@ class AlienInvasion:
         # 创建 Play 按钮
         self.play_button = Button(self, "Play")
 ```
+# 第三步：编写游戏的主循环，主要包括游戏中角色和屏幕的刷新，及check事件执行。
 ```Python
     def run_game(self):
         """开始游戏的主循环"""
@@ -103,7 +104,7 @@ class AlienInvasion:
             self._update_screen()
             self.clock.tick(60)
 ```
-#第三步：编写按键和鼠标的响应事件，通过引用pygame库中的函数(event.get())、类(sprite)、常量(pygame.K_RIGHT按键常量)等。根据按键行为写对应的事件。
+# 第四步：编写按键和鼠标的响应事件，通过引用pygame库中的函数(event.get())、类(sprite)、常量(pygame.K_RIGHT按键常量)等。根据按键行为写对应的事件。
 ```Python
     def _check_events(self):
         """响应按键和鼠标事件"""
@@ -137,7 +138,7 @@ class AlienInvasion:
             self.ship.moving_left = False
 
 ```
-#第四步：编写游戏中的按键响应事件，例如点击Play按钮，将开始游戏，并且游戏内容开始运行例如重置游戏统计信息，创建新的游戏角色等。
+# 第五步：编写游戏中的按键响应事件，例如点击Play按钮，将开始游戏，并且游戏内容开始运行例如重置游戏统计信息，创建新的游戏角色等。
 ```Python
     def _check_play_button(self, mouse_pos):
         """在玩家单击 Play 按钮时开始新游戏"""
@@ -164,7 +165,7 @@ class AlienInvasion:
             # 隐藏光标
             pygame.mouse.set_visible(False)
 ````
-#第五步：编写游戏的其中一个角色“子弹”，并定义子弹初始化的函数和子弹更新的函数，并且在其中对消失的子弹计数以达成记录分数的效果。
+# 第六步：编写游戏的其中一个角色“子弹”，并定义子弹初始化的函数和子弹更新的函数，并且在其中对消失的子弹计数以达成记录分数的效果。
 ```Python
     def _fire_bullet(self):
         """创建一颗子弹，并将其加入编组 bullets """
