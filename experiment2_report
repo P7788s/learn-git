@@ -2,11 +2,11 @@
 
 班级： 22物联2
 
-学号： 20220305232
+学号： B20220305232
 
 姓名： 师钰茹
 
-Github地址：<https://github.com/yourusername/python_course>
+Gitee地址：<https://gitee.com/aqqaqq/alien_invasion.git>
 
 ---
 
@@ -23,19 +23,157 @@ Github地址：<https://github.com/yourusername/python_course>
 3. VSCode插件
 
 ## 实验项目分工协作情况
-
+  大概是根据代码量来分工
 ### 项目组员
-
+刘宇欣、师钰茹、俞懿梅、何宛彤、丰嘉萱
 ### 项目分工
-
-例如：
-
-- 张三：负责游戏的主要逻辑开发
-- 李四：负责游戏的界面设计
-- 王五：负责游戏的音效设计
-- 赵六：负责代码的审查（Review）和测试工作
-
+ - 师钰茹：负责 alien_invasion 文件中的 1 - 139 行
+ - 俞懿梅：负责 alien_invasion 文件中的 140 - 265 行
+ - 何宛彤：负责 alien、bullet 和 button 文件
+ - 刘宇欣：负责 game_stats 和 scoreboard 文件
+ - 丰嘉萱：负责 settings 和 ship 文件
 ## 实验过程记录
+  我负责alien_invasion文件的前半部分即1-139行，主要部分是游戏的初始化，并创建游戏资源；游戏的主循环；响应按键事件：鼠标键盘按键事件和游戏中“Play”按钮的事件。
+同时还包括添加该项目中使用到的python标准库模块和用户自定义模块。代码部分如下
+
+import sys
+from time import sleep
+import pygame
+import os
+
+from settings import Settings
+from game_stats import GameStats
+from scoreboard import Scoreboard
+from button import Button
+from ship import Ship
+from bullet import Bullet
+from alien import Alien
+
+class AlienInvasion:
+    """管理游戏资源和行为的类"""
+
+    def __init__(self):
+        """初始化游戏并创建游戏资源"""
+        pygame.init()
+        self.clock = pygame.time.Clock()
+        self.settings = Settings()
+
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height))
+        os.environ['SDL_VIDEO_CENTERED'] = '1' #居中显示
+        self.screen = pygame.display.set_mode((1000, 600))
+        pygame.display.set_caption("Alien Invasion")
+
+        # 创建存储游戏统计信息的实例，并创建记分牌
+        self.stats = GameStats(self)
+        self.sb = Scoreboard(self)
+
+        self.ship = Ship(self)
+        self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
+
+        self._create_fleet()
+
+        # 设置背景色
+        self.bg_color = (230, 230, 230)
+
+        # 外星人设置
+        self.alien_speed = 1.0
+
+        # 让游戏在一开始处于非活动状态
+        self.game_active = False
+
+        # 创建 Play 按钮
+        self.play_button = Button(self, "Play")
+
+
+    def run_game(self):
+        """开始游戏的主循环"""
+        while True:
+            self._check_events()
+
+            if self.game_active:
+                self.ship.update()
+                self._update_bullets()
+                self._update_aliens()
+                
+            self._update_screen()
+            self.clock.tick(60)
+
+    def _check_events(self):
+        """响应按键和鼠标事件"""
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self._check_keydown_events(event)
+            elif event.type == pygame.KEYUP:
+                self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
+
+    def _check_play_button(self, mouse_pos):
+        """在玩家单击 Play 按钮时开始新游戏"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.game_active:
+            # 还原游戏设置
+            self.settings.initialize_dynamic_settings()
+
+            # 重置游戏的统计信息
+            self.stats.reset_stats()
+            self.sb.prep_score()
+            self.sb.prep_level()
+            self.sb.prep_ships()
+            self.game_active = True
+
+            # 清空外星人列表和子弹列表
+            self.bullets.empty()
+            self.aliens.empty()
+            
+            # 创建一个新的外星舰队，并将飞船放在屏幕底部的中央
+            self._create_fleet()
+            self.ship.center_ship()
+
+            # 隐藏光标
+            pygame.mouse.set_visible(False)
+
+    def _check_keydown_events(self, event):
+        """响应按下"""
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_q:
+            sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()   
+
+    def _check_keyup_events(self, event):
+        """响应释放"""
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+    def _fire_bullet(self):
+        """创建一颗子弹，并将其加入编组 bullets """
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+        """更新子弹的位置并删除已消失的子弹"""
+        # 更新子弹的位置
+        self.bullets.update()
+
+        # 删除已消失的子弹
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+        print(len(self.bullets))
+
+        self._check_bullet_alien_collisions()
 
 实验项目分组进行，小组内部需要对项目的工作分工，每个小组成员提交的报告内容应该主要是自己分配完成的工作。（也可以在报告中引用其他组员完成的工作，但应该以自己完成的工作为主。）
 
