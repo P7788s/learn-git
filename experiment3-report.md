@@ -45,6 +45,13 @@ Github地址：<https://gitee.com/aqqaqq/data-visualization.git>
 
 ## 实验过程记录
 
+ - 流程图
+flowchart TD
+    A[Start] --> B{Is it?}
+    B -->|Yes| C[OK]
+    C --> D[Rethink]
+    D --> B
+    B ---->|No| E[End]
 实验项目分组进行，小组内部需要对项目的工作分工，每个小组成员提交的报告内容应该主要是自己分配完成的工作。（也可以在报告中引用其他组员完成的工作，但应该以自己完成的工作为主。）
 
 ## 实验总结
